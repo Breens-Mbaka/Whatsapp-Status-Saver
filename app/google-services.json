@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "423488098167",
+    "project_id": "whatsapp-status-saver-85b8e",
+    "storage_bucket": "whatsapp-status-saver-85b8e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423488098167:android:5edafe2a0cdc9dbfa61b72",
+        "android_client_info": {
+          "package_name": "com.breens.whatsappstatussaver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtDe-RHi5sK6qovhsSW_XMbZawpYPRNxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

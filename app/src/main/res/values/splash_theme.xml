@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.WhatsappStatusSaver.SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/whatsapp_status_saver_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.WhatsappStatusSaver</item>
+        <item name="android:statusBarColor">@color/primary_color</item>
+    </style>
+</resources>

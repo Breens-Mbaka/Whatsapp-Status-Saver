@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,6 +38,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.firebase.analytics.logEvent
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ImagesScreen(
@@ -53,6 +55,7 @@ fun ImagesScreen(
         permissions = listOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_MEDIA_IMAGES,
         ),
     )
 
@@ -84,6 +87,21 @@ fun ImagesScreen(
                     launcher.launch(intent)
                 },
             )
+            for (permissionState in permissionsState.permissions) {
+                when (permissionState.permission) {
+                    Manifest.permission.READ_MEDIA_IMAGES -> {
+                        if (!permissionState.status.isGranted) {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        if (!permissionState.status.isGranted) {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+                }
+            }
         } else {
             for (permissionState in permissionsState.permissions) {
                 when (permissionState.permission) {
@@ -120,7 +138,7 @@ fun ImagesScreen(
                         Text(
                             text = "Status Saver",
                             style = MaterialTheme.typography.titleLarge.copy(
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Color.White,
                             ),
                         )
                     },

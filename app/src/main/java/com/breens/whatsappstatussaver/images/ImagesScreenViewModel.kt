@@ -1,6 +1,7 @@
 package com.breens.whatsappstatussaver.images
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
@@ -39,6 +40,7 @@ class ImagesScreenViewModel @Inject constructor(private val analytics: FirebaseA
                 ".png",
             )
         }
+        Log.e("FILES", "$files")
         filesState.value = convertFilesToCommonModel(files = filteredFiles)
     }
 

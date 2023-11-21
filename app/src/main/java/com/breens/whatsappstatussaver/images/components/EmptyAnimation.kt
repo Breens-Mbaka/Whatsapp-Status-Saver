@@ -38,7 +38,7 @@ fun EmptyAnimation() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "No whatsapp status available, try viewing the images on Whatsapp first",
+                text = "Please wait as we get your Whatsapp statuses...",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     textAlign = TextAlign.Center,
                 ),

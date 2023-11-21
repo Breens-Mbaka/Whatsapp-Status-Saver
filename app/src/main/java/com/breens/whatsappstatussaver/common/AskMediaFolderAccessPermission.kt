@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 
+
 @SuppressLint("InlinedApi")
 fun askMediaFolderAccessPermission(context: Context, askPermission: (Intent) -> Unit) {
     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)

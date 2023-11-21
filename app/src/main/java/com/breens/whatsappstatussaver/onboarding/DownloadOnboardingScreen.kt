@@ -69,7 +69,7 @@ fun ImagesOnboardingScreen(
                             fontWeight = FontWeight.Light,
                         ),
                     ) {
-                        append("Save images and videos that you've viewed on your Whatsapp Status")
+                        append("Easily save Whatsapp Status images with a tap")
                     }
                 },
                 textAlign = TextAlign.Center,

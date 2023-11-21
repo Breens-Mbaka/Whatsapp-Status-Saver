@@ -1,10 +1,10 @@
 package com.breens.whatsappstatussaver.onboarding
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.breens.whatsappstatussaver.data.PreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DownloadingOnboardingScreenViewModel @Inject constructor(private val preferencesRepository: PreferencesRepository) :
     ViewModel() {
 
-    val isOnBoardingCompletedState = MutableStateFlow(false)
+    val isOnBoardingCompletedState = mutableStateOf(false)
 
     fun setIsOnboardingCompleted(isOnBoardingCompleted: Boolean) {
         viewModelScope.launch {

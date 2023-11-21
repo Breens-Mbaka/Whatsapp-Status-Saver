@@ -12,7 +12,8 @@ import java.io.IOException
 fun saveImageForLegacyStorage(imageUri: Uri, context: Context) {
     val downloadsFolder =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val destinationFile = File(downloadsFolder, "whatsapp_status_saver_image.jpg")
+    val timeStamp = System.currentTimeMillis()
+    val destinationFile = File(downloadsFolder, "whatsapp_status_saver_image_$timeStamp.jpg")
 
     try {
         context.contentResolver.openInputStream(imageUri)?.use { inputStream ->

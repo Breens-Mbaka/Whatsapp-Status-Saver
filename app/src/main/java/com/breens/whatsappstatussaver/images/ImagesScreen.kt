@@ -3,7 +3,6 @@ package com.breens.whatsappstatussaver.images
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,12 +18,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.breens.whatsappstatussaver.common.askMediaFolderAccessPermission
 import com.breens.whatsappstatussaver.common.getWAStatusesUsingFromNormalStorage
@@ -32,12 +28,16 @@ import com.breens.whatsappstatussaver.common.getWAStatusesUsingScopedStorage
 import com.breens.whatsappstatussaver.common.saveImageForLegacyStorage
 import com.breens.whatsappstatussaver.common.saveImageForScopedStorage
 import com.breens.whatsappstatussaver.common.saveImageToDownloads
+import com.breens.whatsappstatussaver.images.components.EmptyAnimation
 import com.breens.whatsappstatussaver.images.components.ImageStatus
 import com.breens.whatsappstatussaver.ui.theme.PrimaryColor800
 import com.breens.whatsappstatussaver.ui.theme.WhatsappStatusSaverTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.firebase.analytics.logEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ImagesScreen(
     imagesScreenViewModel: ImagesScreenViewModel = hiltViewModel(),
@@ -45,6 +45,16 @@ fun ImagesScreen(
     val analytics = imagesScreenViewModel.analytics()
 
     val context = LocalContext.current
+
+    val files = imagesScreenViewModel.filesState.collectAsState()
+
+    // Include edge case when reading storage from Android 11 and above
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        ),
+    )
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -66,44 +76,6 @@ fun ImagesScreen(
         }
     }
 
-    val hasImageStoragePermission = remember {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            mutableStateOf(
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                ) == PackageManager.PERMISSION_GRANTED,
-            )
-        } else {
-            mutableStateOf(
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                ) == PackageManager.PERMISSION_GRANTED,
-            )
-        }
-    }
-
-    val imageStoragePermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { granted ->
-            hasImageStoragePermission.value = granted
-        },
-    )
-
-    if (ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_MEDIA_IMAGES,
-        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        hasImageStoragePermission.value = true
-    }
-
-    val files = imagesScreenViewModel.filesState.collectAsState()
-
     LaunchedEffect(key1 = true) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             askMediaFolderAccessPermission(
@@ -113,20 +85,28 @@ fun ImagesScreen(
                 },
             )
         } else {
-            if (hasImageStoragePermission.value) {
-                getWAStatusesUsingFromNormalStorage(
-                    setStatusFiles = { files, isDocumentStorage ->
-                        imagesScreenViewModel.setStatusFiles(
-                            files = files.toList(),
-                            isDocumentStorage = isDocumentStorage,
-                        )
-                    },
-                )
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    imageStoragePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-                } else {
-                    imageStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            for (permissionState in permissionsState.permissions) {
+                when (permissionState.permission) {
+                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                        if (permissionState.status.isGranted) {
+                            getWAStatusesUsingFromNormalStorage(
+                                setStatusFiles = { files, isDocumentStorage ->
+                                    imagesScreenViewModel.setStatusFiles(
+                                        files = files.toList(),
+                                        isDocumentStorage = isDocumentStorage,
+                                    )
+                                },
+                            )
+                        } else {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        if (!permissionState.status.isGranted) {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
                 }
             }
         }
@@ -139,7 +119,9 @@ fun ImagesScreen(
                     title = {
                         Text(
                             text = "Status Saver",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            ),
                         )
                     },
                     colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -149,6 +131,21 @@ fun ImagesScreen(
             },
             containerColor = Color.White,
         ) { paddingValues ->
+            for (permissionState in permissionsState.permissions) {
+                if (permissionState.permission == Manifest.permission.READ_EXTERNAL_STORAGE && permissionState.status.isGranted) {
+                    getWAStatusesUsingFromNormalStorage(
+                        setStatusFiles = { files, isDocumentStorage ->
+                            imagesScreenViewModel.setStatusFiles(
+                                files = files.toList(),
+                                isDocumentStorage = isDocumentStorage,
+                            )
+                        },
+                    )
+                } else {
+                    permissionState.launchPermissionRequest()
+                }
+            }
+
             Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 if (files.value.isNotEmpty()) {
                     ImageStatus(
@@ -171,18 +168,25 @@ fun ImagesScreen(
                                     }
                                 },
                                 saveImageForLegacyStorage = {
-                                    saveImageForLegacyStorage(
-                                        imageUri = imageUri,
-                                        context = context,
-                                    )
-
-                                    analytics.logEvent("IMAGE_STORAGE") {
-                                        param("STORAGE", "Legacy Storage")
+                                    for (permissionState in permissionsState.permissions) {
+                                        if (permissionState.permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && permissionState.status.isGranted) {
+                                            saveImageForLegacyStorage(
+                                                imageUri = imageUri,
+                                                context = context,
+                                            )
+                                            analytics.logEvent("IMAGE_STORAGE") {
+                                                param("STORAGE", "Legacy Storage")
+                                            }
+                                        } else {
+                                            permissionState.launchPermissionRequest()
+                                        }
                                     }
                                 },
                             )
                         },
                     )
+                } else {
+                    EmptyAnimation()
                 }
             }
         }

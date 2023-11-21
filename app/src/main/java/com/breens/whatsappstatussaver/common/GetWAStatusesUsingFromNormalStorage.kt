@@ -8,8 +8,11 @@ fun getWAStatusesUsingFromNormalStorage(setStatusFiles: (files: List<File>, isDo
     try {
         val folder = File(
             Environment.getExternalStorageDirectory()
-                .toString() + "/Android/media/com.whatsapp/WhatsApp/Media/.Statuses",
+                .toString() + "/WhatsApp/Media/.Statuses",
         )
+//        val folder = File(
+//            Environment.getExternalStorageDirectory().absolutePath + "/WhatsApp/Media/.Statuses",
+//        )
         if (!folder.exists() || !folder.isDirectory) {
             Log.e("Error", "Directory does not exist or is not a directory")
             return

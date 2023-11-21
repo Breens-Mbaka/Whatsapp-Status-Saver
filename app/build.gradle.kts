@@ -100,6 +100,12 @@ dependencies {
 
     // Firebase Crashlytics
     implementation("com.google.firebase:firebase-crashlytics")
+
+    // Accompanist
+    implementation("com.google.accompanist:accompanist-permissions:0.25.0")
+
+    // Lottie
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
 }
 
 kapt {

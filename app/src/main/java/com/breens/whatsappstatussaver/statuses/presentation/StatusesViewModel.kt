@@ -4,7 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.breens.whatsappstatussaver.save.domain.SaveImagesRepository
-import com.breens.whatsappstatussaver.statuses.domain.GetStatusImagesRepository
+import com.breens.whatsappstatussaver.statuses.domain.GetStatusesRepository
+import com.breens.whatsappstatussaver.statuses.domain.Media
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,12 +18,12 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class StatusesViewModel @Inject constructor(
-    private val getStatusImagesRepository: GetStatusImagesRepository,
+    private val getStatusesRepository: GetStatusesRepository,
     private val saveImagesRepository: SaveImagesRepository,
     private val analytics: FirebaseAnalytics,
 ) : ViewModel() {
     private val _statusesScreenUiState = MutableStateFlow(StatusesScreenUiState())
-    val imagesUiState = _statusesScreenUiState.asStateFlow()
+    val statusesScreenUiState = _statusesScreenUiState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<StatusesScreenUiEvents>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -37,11 +38,21 @@ class StatusesViewModel @Inject constructor(
                 }
 
                 is StatusesScreenUiEvents.GetStatusImages -> {
-                    getStatusImages(event.uri, event.fromNormalStorage)
+                    val mediaType = if (statusesScreenUiState.value.selectedTab == 0) {
+                        "image"
+                    } else {
+                        "video"
+                    }
+
+                    getStatusImages(
+                        uri = event.uri,
+                        fromNormalStorage = event.fromNormalStorage,
+                        mediaType = mediaType
+                    )
                 }
 
-                is StatusesScreenUiEvents.SaveImage -> {
-                    saveImage(event.imageUri)
+                is StatusesScreenUiEvents.SaveMediaFile -> {
+                    saveImageFile(mediaFile = event.mediaFile)
                 }
 
                 is StatusesScreenUiEvents.ChangeTab -> {
@@ -52,36 +63,55 @@ class StatusesViewModel @Inject constructor(
     }
 
     private fun changeTab(selectedTab: Int) {
-        _statusesScreenUiState.update {
-            it.copy(
-                selectedTab = selectedTab
+        viewModelScope.launch {
+            _statusesScreenUiState.update {
+                it.copy(
+                    selectedTab = selectedTab
+                )
+            }
+
+            val uri = statusesScreenUiState.value.uri
+            val fromNormalStorage = statusesScreenUiState.value.fromNormalStorage
+            val mediaType = if (selectedTab == 0) {
+                "image"
+            } else {
+                "video"
+            }
+
+            getStatusImages(
+                uri = uri,
+                fromNormalStorage = fromNormalStorage,
+                mediaType = mediaType
             )
         }
     }
 
-    private fun getStatusImages(uri: Uri?, fromNormalStorage: Boolean) {
+    private fun getStatusImages(uri: Uri?, fromNormalStorage: Boolean, mediaType: String) {
         viewModelScope.launch {
             _statusesScreenUiState.update {
                 it.copy(
-                    isLoading = true
+                    isLoading = true,
+                    uri = uri,
+                    fromNormalStorage = fromNormalStorage,
                 )
             }
 
-            val images = getStatusImagesRepository.getStatusImages(
+            val media = getStatusesRepository.getStatuses(
                 uri = uri,
                 fromNormalStorage = fromNormalStorage,
+                mediaType = mediaType,
             )
 
             _statusesScreenUiState.update {
                 it.copy(
                     isLoading = false,
-                    images = images
+                    media = media
                 )
             }
         }
     }
 
-    private fun saveImage(imageUri: Uri) {
+    private fun saveImageFile(mediaFile: Media) {
         viewModelScope.launch {
             _statusesScreenUiState.update {
                 it.copy(
@@ -89,7 +119,7 @@ class StatusesViewModel @Inject constructor(
                 )
             }
 
-            val isSavedSuccessfully = saveImagesRepository.saveImage(imageUri)
+            val isSavedSuccessfully = saveImagesRepository.saveImage(mediaFile = mediaFile)
 
             if (isSavedSuccessfully) {
                 _statusesScreenUiState.update {

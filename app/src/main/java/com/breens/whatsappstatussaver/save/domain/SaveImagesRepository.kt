@@ -1,7 +1,7 @@
 package com.breens.whatsappstatussaver.save.domain
 
-import android.net.Uri
+import com.breens.whatsappstatussaver.statuses.domain.Media
 
 interface SaveImagesRepository {
-    suspend fun saveImage(imageUri: Uri): Boolean
+    suspend fun saveImage(mediaFile: Media): Boolean
 }

@@ -1,9 +1,9 @@
 package com.breens.whatsappstatussaver.di
 
 import android.content.Context
-import com.breens.whatsappstatussaver.statuses.data.GetStatusImagesRepositoryImpl
+import com.breens.whatsappstatussaver.statuses.data.GetStatusesRepositoryImpl
 import com.breens.whatsappstatussaver.preferences.data.PreferenceRepositoryImpl
-import com.breens.whatsappstatussaver.statuses.domain.GetStatusImagesRepository
+import com.breens.whatsappstatussaver.statuses.domain.GetStatusesRepository
 import com.breens.whatsappstatussaver.preferences.domain.PreferencesRepository
 import com.breens.whatsappstatussaver.save.data.SaveImagesRepositoryImpl
 import com.breens.whatsappstatussaver.save.domain.SaveImagesRepository
@@ -26,8 +26,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providesImagesRepository(@ApplicationContext context: Context): GetStatusImagesRepository {
-        return GetStatusImagesRepositoryImpl(context = context)
+    fun providesImagesRepository(@ApplicationContext context: Context): GetStatusesRepository {
+        return GetStatusesRepositoryImpl(context = context)
     }
 
     @Provides

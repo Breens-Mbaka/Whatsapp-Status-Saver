@@ -56,7 +56,7 @@ fun StatusesScreen(
                 viewModel.sendEvent(
                     event = StatusesScreenUiEvents.GetStatusImages(
                         uri = intent.data,
-                        fromNormalStorage = false
+                        fromNormalStorage = false,
                     )
                 )
             }
@@ -85,18 +85,18 @@ fun StatusesScreen(
                     analytics.logEvent("get_status_images", null)
                 }
 
-                is StatusesScreenUiEvents.SaveImage -> {
+                is StatusesScreenUiEvents.SaveMediaFile -> {
                     analytics.logEvent("save_image", null)
                 }
 
                 is StatusesScreenUiEvents.ChangeTab -> {
-                    analytics.logEvent("change_tab:${event.tab}", null)
+                    analytics.logEvent("change_tab", null)
                 }
             }
         }
     }
 
-    val imagesUiState by viewModel.imagesUiState.collectAsState()
+    val imagesUiState by viewModel.statusesScreenUiState.collectAsState()
 
     StatusesScreenContent(
         imagesUiState = imagesUiState,
@@ -146,10 +146,7 @@ private fun StatusesScreenContent(
             modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            TabRow(
-                modifier = Modifier.padding(14.dp),
-                selectedTabIndex = imagesUiState.selectedTab
-            ) {
+            TabRow(selectedTabIndex = imagesUiState.selectedTab) {
                 imagesUiState.tabs.forEach { tabItem ->
                     Tab(
                         modifier = Modifier.padding(14.dp),
@@ -171,11 +168,11 @@ private fun StatusesScreenContent(
             }
 
             StatusesGrid(
-                images = imagesUiState.images,
-                saveImageToDownloads = { imageUri ->
+                media = imagesUiState.media,
+                saveMediaFile = { mediaFile ->
                     sendEvent(
-                        StatusesScreenUiEvents.SaveImage(
-                            imageUri = imageUri
+                        StatusesScreenUiEvents.SaveMediaFile(
+                            mediaFile = mediaFile
                         )
                     )
                 },

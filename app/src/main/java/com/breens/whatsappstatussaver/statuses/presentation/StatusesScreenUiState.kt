@@ -1,10 +1,13 @@
 package com.breens.whatsappstatussaver.statuses.presentation
 
 import android.net.Uri
+import com.breens.whatsappstatussaver.statuses.domain.Media
 
 data class StatusesScreenUiState(
     val isLoading: Boolean = false,
-    val images: List<Uri> = emptyList(),
+    val uri: Uri? = null,
+    val fromNormalStorage: Boolean = false,
+    val media: List<Media> = emptyList(),
     val savingImage: Boolean = false,
     val imageSavedSuccessfully: Boolean = false,
     val selectedTab: Int = 0,

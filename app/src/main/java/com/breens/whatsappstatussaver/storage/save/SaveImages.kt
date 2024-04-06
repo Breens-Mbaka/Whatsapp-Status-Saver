@@ -3,69 +3,83 @@ package com.breens.whatsappstatussaver.storage.save
 import android.content.ContentValues
 import android.content.Context
 import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
+import com.breens.whatsappstatussaver.statuses.domain.Media
 import java.io.File
 import java.io.FileOutputStream
 
-fun Context.saveImage(imageUri: Uri): Boolean {
+fun Context.saveMediaFile(mediaFile: Media): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        saveImageForScopedStorage(imageUri = imageUri, context = this)
+        saveMediaFileForScopedStorage(mediaFile = mediaFile, context = this)
     } else {
-        saveImageForLegacyStorage(imageUri = imageUri, context = this)
+        saveMediaFileForLegacyStorage(mediaFile = mediaFile, context = this)
     }
 }
 
-fun saveImageForLegacyStorage(imageUri: Uri, context: Context): Boolean {
+fun saveMediaFileForLegacyStorage(mediaFile: Media, context: Context): Boolean {
     return try {
-        val downloadsFolder =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val timeStamp = System.currentTimeMillis()
-        val destinationFile = File(downloadsFolder, "whatsapp_status_saver_image_$timeStamp.jpg")
+        val mediaUri = if (mediaFile.isVideo) mediaFile.videoUri else mediaFile.thumbnailUri
 
-        context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-            FileOutputStream(destinationFile).use { outputStream ->
-                inputStream.copyTo(outputStream)
+        if (mediaUri != null) {
+            val downloadsFolder =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val timeStamp = System.currentTimeMillis()
+            val mimeType = if (mediaFile.isVideo) ".mp4" else ".jpeg"
+            val destinationFile =
+                File(downloadsFolder, "whatsapp_status_saver_$timeStamp$mimeType")
+
+            context.contentResolver.openInputStream(mediaUri)?.use { inputStream ->
+                FileOutputStream(destinationFile).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
             }
+
+            // Notify MediaStore about the new file
+            MediaScannerConnection.scanFile(
+                context,
+                arrayOf(destinationFile.absolutePath),
+                null,
+                null,
+            )
+            return true
         }
 
-        // Notify MediaStore about the new file
-        MediaScannerConnection.scanFile(
-            context,
-            arrayOf(destinationFile.absolutePath),
-            null,
-            null,
-        )
-        true
+        false
     } catch (e: Exception) {
         false
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
-fun saveImageForScopedStorage(
-    imageUri: Uri,
+fun saveMediaFileForScopedStorage(
+    mediaFile: Media,
     context: Context,
 ): Boolean {
     return try {
-        val resolver = context.contentResolver
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, "whatsapp_status_image.jpg")
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-        }
+        val mediaUri = if (mediaFile.isVideo) mediaFile.videoUri else mediaFile.thumbnailUri
 
-        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-        uri?.let { newUri ->
-            resolver.openOutputStream(newUri)?.use { outputStream ->
-                resolver.openInputStream(imageUri)?.use { inputStream ->
-                    inputStream.copyTo(outputStream)
-                }
+        if (mediaUri != null) {
+            val resolver = context.contentResolver
+            val timeStamp = System.currentTimeMillis()
+            val mimeType = if (mediaFile.isVideo) "video/mp4" else "image/jpeg"
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "whatsapp_status_saver_$timeStamp")
+                put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
-            return true
+
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            uri?.let { newUri ->
+                resolver.openOutputStream(newUri)?.use { outputStream ->
+                    resolver.openInputStream(mediaUri)?.use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                return true
+            }
         }
         false
     } catch (e: Exception) {

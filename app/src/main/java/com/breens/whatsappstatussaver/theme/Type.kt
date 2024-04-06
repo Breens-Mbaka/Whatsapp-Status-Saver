@@ -1,4 +1,4 @@
-package com.breens.whatsappstatussaver.ui.theme
+package com.breens.whatsappstatussaver.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

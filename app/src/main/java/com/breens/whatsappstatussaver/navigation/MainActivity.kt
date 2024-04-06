@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.breens.whatsappstatussaver.onboarding.DownloadingOnboardingScreenViewModel
+import com.breens.whatsappstatussaver.theme.WhatsappStatusSaverTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,9 +29,11 @@ class MainActivity : ComponentActivity() {
             val isOnBoardingCompletedState =
                 downloadingOnboardingScreenViewModel.isOnBoardingCompletedState
 
-            WhatsappStatusSaverApp(
-                isOnBoardingCompleted = isOnBoardingCompletedState.value,
-            )
+            WhatsappStatusSaverTheme {
+                WhatsappStatusSaverApp(
+                    isOnBoardingCompleted = isOnBoardingCompletedState.value,
+                )
+            }
         }
     }
 

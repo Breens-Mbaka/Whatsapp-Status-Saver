@@ -1,4 +1,4 @@
-package com.breens.whatsappstatussaver.preferences
+package com.breens.whatsappstatussaver.preferences.data
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.breens.whatsappstatussaver.images.ImagesScreen
+import com.breens.whatsappstatussaver.statuses.presentation.StatusesScreen
 import com.breens.whatsappstatussaver.onboarding.ImagesOnboardingScreen
 
 @Composable
@@ -57,7 +57,7 @@ fun WhatsappStatusSaverNavHost(
                 )
             },
         ) {
-            ImagesScreen()
+            StatusesScreen()
         }
     }
 }

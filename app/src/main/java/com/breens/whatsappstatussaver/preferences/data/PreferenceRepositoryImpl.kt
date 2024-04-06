@@ -1,18 +1,18 @@
-package com.breens.whatsappstatussaver.data
+package com.breens.whatsappstatussaver.preferences.data
 
 import android.content.Context
 import android.net.Uri
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.breens.whatsappstatussaver.preferences.Preferences.dataStore
-import com.breens.whatsappstatussaver.preferences.PreferencesKeys
+import com.breens.whatsappstatussaver.preferences.domain.PreferencesRepository
+import com.breens.whatsappstatussaver.preferences.data.Preferences.dataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-class PreferenceRepositoryImplementation(@ApplicationContext private val context: Context) :
+class PreferenceRepositoryImpl(@ApplicationContext private val context: Context) :
     PreferencesRepository {
     override fun getIsPermissionGranted(): Flow<Boolean> {
         val isPermissionGranted: Flow<Boolean> = context.dataStore.data

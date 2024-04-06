@@ -1,4 +1,4 @@
-package com.breens.whatsappstatussaver.data
+package com.breens.whatsappstatussaver.preferences.domain
 
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow

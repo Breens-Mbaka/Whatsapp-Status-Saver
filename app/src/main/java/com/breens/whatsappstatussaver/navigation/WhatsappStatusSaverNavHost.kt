@@ -2,7 +2,6 @@ package com.breens.whatsappstatussaver.navigation
 
 import android.net.Uri
 import android.os.Build
-import android.os.Parcelable
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -11,11 +10,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.breens.whatsappstatussaver.statuses.presentation.StatusesScreen
 import com.breens.whatsappstatussaver.onboarding.ImagesOnboardingScreen
+import com.breens.whatsappstatussaver.player.domain.Video
+import com.breens.whatsappstatussaver.player.domain.VideoType
 import com.breens.whatsappstatussaver.player.presentation.PreviewVideoScreen
+import com.breens.whatsappstatussaver.statuses.presentation.StatusesScreen
 import com.google.gson.Gson
-import kotlinx.parcelize.Parcelize
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -90,9 +90,3 @@ fun WhatsappStatusSaverNavHost(
         }
     }
 }
-
-@Parcelize
-data class Video(
-    val videoUri: String,
-) : Parcelable
-

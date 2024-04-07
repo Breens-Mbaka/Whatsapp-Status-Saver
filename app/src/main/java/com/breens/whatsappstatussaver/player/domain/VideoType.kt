@@ -1,4 +1,4 @@
-package com.breens.whatsappstatussaver.navigation
+package com.breens.whatsappstatussaver.player.domain
 
 import android.os.Bundle
 import androidx.navigation.NavType

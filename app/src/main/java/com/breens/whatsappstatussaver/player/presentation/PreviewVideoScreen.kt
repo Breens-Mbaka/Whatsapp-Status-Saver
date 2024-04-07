@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
-import com.breens.whatsappstatussaver.navigation.Video
 import com.breens.whatsappstatussaver.player.data.VideoPlayer
+import com.breens.whatsappstatussaver.player.domain.Video
 
 @kotlin.OptIn(ExperimentalMaterial3Api::class)
 @OptIn(UnstableApi::class)

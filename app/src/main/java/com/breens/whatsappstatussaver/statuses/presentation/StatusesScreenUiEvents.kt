@@ -7,5 +7,6 @@ sealed class StatusesScreenUiEvents {
     data class ShowSnackBar(val message: String) : StatusesScreenUiEvents()
     data class GetStatusImages(val uri: Uri?, val fromNormalStorage: Boolean) : StatusesScreenUiEvents()
     data class SaveMediaFile(val mediaFile: Media) : StatusesScreenUiEvents()
+    data class ShareMediaFile(val mediaFile: Media) : StatusesScreenUiEvents()
     data class ChangeTab(val tab: Int) : StatusesScreenUiEvents()
 }

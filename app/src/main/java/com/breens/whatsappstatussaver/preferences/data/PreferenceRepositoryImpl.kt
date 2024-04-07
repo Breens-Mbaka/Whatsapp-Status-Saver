@@ -1,79 +1,51 @@
 package com.breens.whatsappstatussaver.preferences.data
 
-import android.content.Context
 import android.net.Uri
+import android.util.Log
+import androidx.core.net.toUri
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.breens.whatsappstatussaver.preferences.domain.PreferencesRepository
-import com.breens.whatsappstatussaver.preferences.data.Preferences.dataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import java.io.IOException
 
-class PreferenceRepositoryImpl(@ApplicationContext private val context: Context) :
+class PreferenceRepositoryImpl(
+    private val dataStore: DataStore<Preferences>,
+) :
     PreferencesRepository {
-    override fun getIsPermissionGranted(): Flow<Boolean> {
-        val isPermissionGranted: Flow<Boolean> = context.dataStore.data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }
-            .map { preferences ->
-                preferences[PreferencesKeys.PERMISSION_GRANTED] ?: false
-            }
-        return isPermissionGranted
-    }
-
-    override suspend fun setIsPermissionGranted(permissionGranted: Boolean) {
-        context.dataStore.edit { mutablePreferences ->
-            mutablePreferences[PreferencesKeys.PERMISSION_GRANTED] = permissionGranted
-        }
-    }
-
-    override suspend fun setUri(uri: Uri) {
-        context.dataStore.edit { mutablePreferences ->
+    override suspend fun setUri(uri: Uri?) {
+        Log.e("PreferenceRepository", "setUri: $uri")
+        dataStore.edit { mutablePreferences ->
             mutablePreferences[PreferencesKeys.URI] = uri.toString()
         }
     }
 
-    override suspend fun getUri(): Flow<Uri> {
-        val uri: Flow<Uri> = context.dataStore.data.catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            val uriString = preferences[PreferencesKeys.URI] ?: ""
-
-            Uri.parse(uriString)
+    override suspend fun getUri(): Flow<Uri?> {
+        return dataStore.data.map { preferences ->
+            val uriString = preferences[PreferencesKeys.URI]
+            Log.e("PreferenceRepository", "getUri: ${uriString?.toUri()}")
+            uriString?.toUri()
         }
-
-        return uri
     }
 
     override suspend fun setIsOnboardingCompleted(isOnBoardingCompleted: Boolean) {
-        context.dataStore.edit { mutablePreferences ->
+        dataStore.edit { mutablePreferences ->
             mutablePreferences[PreferencesKeys.IS_ONBOARDED_COMPLETED] = isOnBoardingCompleted
         }
     }
 
     override suspend fun isOnBoardingCompleted(): Flow<Boolean> {
-        val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
+        return dataStore.data.map { preferences ->
             preferences[PreferencesKeys.IS_ONBOARDED_COMPLETED] ?: false
         }
-
-        return isOnboardingCompleted
     }
+}
+
+object PreferencesKeys {
+    val URI = stringPreferencesKey("uri")
+
+    val IS_ONBOARDED_COMPLETED = booleanPreferencesKey("is_onboarded")
 }

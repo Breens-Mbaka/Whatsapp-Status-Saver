@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
+import com.breens.whatsappstatussaver.share.shareImage
+import com.breens.whatsappstatussaver.share.shareVideo
 import com.breens.whatsappstatussaver.statuses.presentation.components.StatusesGrid
 import kotlinx.coroutines.flow.collectLatest
 
@@ -75,6 +77,7 @@ fun StatusesScreen(
                 )
             )
         }
+
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is StatusesScreenUiEvents.ShowSnackBar -> {
@@ -91,6 +94,14 @@ fun StatusesScreen(
 
                 is StatusesScreenUiEvents.ChangeTab -> {
                     analytics.logEvent("change_tab", null)
+                }
+
+                is StatusesScreenUiEvents.ShareMediaFile -> {
+                    if (event.mediaFile.isVideo) {
+                        context.shareVideo(videoUri = event.mediaFile.videoUri)
+                    } else {
+                        context.shareImage(imageUri = event.mediaFile.thumbnailUri)
+                    }
                 }
             }
         }
@@ -176,6 +187,13 @@ private fun StatusesScreenContent(
                         )
                     )
                 },
+                shareMediaFile = { mediaFile ->
+                    sendEvent(
+                        StatusesScreenUiEvents.ShareMediaFile(
+                            mediaFile = mediaFile
+                        )
+                    )
+                }
             )
         }
     }

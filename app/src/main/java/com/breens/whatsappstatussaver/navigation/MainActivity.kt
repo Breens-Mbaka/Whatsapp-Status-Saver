@@ -1,9 +1,11 @@
 package com.breens.whatsappstatussaver.navigation
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -17,6 +19,7 @@ class MainActivity : ComponentActivity() {
 
     private val downloadingOnboardingScreenViewModel: DownloadingOnboardingScreenViewModel by viewModels()
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -37,13 +40,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Composable
     fun WhatsappStatusSaverApp(isOnBoardingCompleted: Boolean) {
         val navHostController = rememberNavController()
 
         WhatsappStatusSaverNavHost(
             navHostController = navHostController,
-            isOnBoardingCompleted = isOnBoardingCompleted,
+            startDestination = if (isOnBoardingCompleted) "images" else "download_onboarding_screen",
         )
     }
 }

@@ -58,6 +58,12 @@ class StatusesViewModel @Inject constructor(
                 is StatusesScreenUiEvents.ChangeTab -> {
                     changeTab(selectedTab = event.tab)
                 }
+
+                is StatusesScreenUiEvents.ShareMediaFile -> {
+                   _eventFlow.emit(
+                       StatusesScreenUiEvents.ShareMediaFile(mediaFile = event.mediaFile)
+                   )
+                }
             }
         }
     }

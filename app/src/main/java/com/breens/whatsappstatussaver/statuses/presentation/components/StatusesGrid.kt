@@ -2,7 +2,9 @@ package com.breens.whatsappstatussaver.statuses.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,6 +35,7 @@ import com.breens.whatsappstatussaver.statuses.domain.Media
 fun StatusesGrid(
     media: List<Media>,
     saveMediaFile: (Media) -> Unit,
+    shareMediaFile: (Media) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.padding(16.dp),
@@ -53,24 +57,47 @@ fun StatusesGrid(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                     )
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.primary)
-                            .size(40.dp)
-                            .clickable {
-                                saveMediaFile(mediaFile)
+                    Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                        Column(
+                            modifier = Modifier.padding(2.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .size(40.dp)
+                                    .clickable {
+                                        saveMediaFile(mediaFile)
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Download,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                )
                             }
-                            .align(Alignment.TopEnd),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Download,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                        )
+
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .size(40.dp)
+                                    .clickable {
+                                        shareMediaFile(mediaFile)
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
+                        }
                     }
                 }
             }

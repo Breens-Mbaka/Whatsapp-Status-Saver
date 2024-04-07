@@ -1,6 +1,8 @@
 package com.breens.whatsappstatussaver.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.breens.whatsappstatussaver.statuses.data.GetStatusesRepositoryImpl
 import com.breens.whatsappstatussaver.preferences.data.PreferenceRepositoryImpl
 import com.breens.whatsappstatussaver.statuses.domain.GetStatusesRepository
@@ -20,8 +22,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providesPreferencesRepository(@ApplicationContext context: Context): PreferencesRepository {
-        return PreferenceRepositoryImpl(context = context)
+    fun providesPreferencesRepository(
+        dataStore: DataStore<Preferences>,
+    ): PreferencesRepository {
+        return PreferenceRepositoryImpl(dataStore = dataStore)
     }
 
     @Provides

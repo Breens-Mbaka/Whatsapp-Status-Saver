@@ -39,6 +39,7 @@ import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
 import com.breens.whatsappstatussaver.share.shareImage
 import com.breens.whatsappstatussaver.share.shareVideo
 import com.breens.whatsappstatussaver.statuses.presentation.components.FulImageDialog
+import com.breens.whatsappstatussaver.statuses.presentation.components.LoadingAnimation
 import com.breens.whatsappstatussaver.statuses.presentation.components.StatusesGrid
 import kotlinx.coroutines.flow.collectLatest
 
@@ -117,10 +118,10 @@ fun StatusesScreen(
         }
     }
 
-    val imagesUiState by viewModel.statusesScreenUiState.collectAsState()
+    val statusesScreenUiState by viewModel.statusesScreenUiState.collectAsState()
 
     StatusesScreenContent(
-        imagesUiState = imagesUiState,
+        statusesScreenUiState = statusesScreenUiState,
         snackBarHostState = snackBarHostState,
         sendEvent = viewModel::sendEvent,
     )
@@ -129,7 +130,7 @@ fun StatusesScreen(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun StatusesScreenContent(
-    imagesUiState: StatusesScreenUiState,
+    statusesScreenUiState: StatusesScreenUiState,
     snackBarHostState: SnackbarHostState,
     sendEvent: (StatusesScreenUiEvents) -> Unit,
 ) {
@@ -147,9 +148,9 @@ private fun StatusesScreenContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (imagesUiState.imageSavedSuccessfully) Icons.Rounded.CheckCircle else Icons.Rounded.Error,
+                                imageVector = if (statusesScreenUiState.imageSavedSuccessfully) Icons.Rounded.CheckCircle else Icons.Rounded.Error,
                                 contentDescription = null,
-                                tint = if (imagesUiState.imageSavedSuccessfully) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                tint = if (statusesScreenUiState.imageSavedSuccessfully) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                             )
 
                             Text(
@@ -163,9 +164,13 @@ private fun StatusesScreenContent(
             )
         },
     ) { paddingValues ->
-        if (imagesUiState.showFullImageDialog) {
+        if (statusesScreenUiState.isLoading) {
+            LoadingAnimation()
+        }
+
+        if (statusesScreenUiState.showFullImageDialog) {
             FulImageDialog(
-                imageUri = imagesUiState.imageUriClicked,
+                imageUri = statusesScreenUiState.imageUriClicked,
                 closeDialog = {
                     sendEvent(
                         StatusesScreenUiEvents.ShowFullImageDialog(
@@ -177,63 +182,65 @@ private fun StatusesScreenContent(
             )
         }
 
-        Column(
-            modifier = Modifier.padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            TabRow(selectedTabIndex = imagesUiState.selectedTab) {
-                imagesUiState.tabs.forEach { tabItem ->
-                    Tab(
-                        modifier = Modifier.padding(14.dp),
-                        selected = imagesUiState.selectedTab == tabItem.index,
-                        onClick = {
-                            sendEvent(
-                                StatusesScreenUiEvents.ChangeTab(
-                                    tab = tabItem.index
+        if (!statusesScreenUiState.isLoading && statusesScreenUiState.media.isNotEmpty()) {
+            Column(
+                modifier = Modifier.padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                TabRow(selectedTabIndex = statusesScreenUiState.selectedTab) {
+                    statusesScreenUiState.tabs.forEach { tabItem ->
+                        Tab(
+                            modifier = Modifier.padding(14.dp),
+                            selected = statusesScreenUiState.selectedTab == tabItem.index,
+                            onClick = {
+                                sendEvent(
+                                    StatusesScreenUiEvents.ChangeTab(
+                                        tab = tabItem.index
+                                    )
                                 )
+                            }
+                        ) {
+                            Text(
+                                text = tabItem.title,
+                                style = MaterialTheme.typography.titleMedium,
                             )
                         }
-                    ) {
-                        Text(
-                            text = tabItem.title,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
                     }
                 }
-            }
 
-            StatusesGrid(
-                media = imagesUiState.media,
-                saveMediaFile = { mediaFile ->
-                    sendEvent(
-                        StatusesScreenUiEvents.SaveMediaFile(
-                            mediaFile = mediaFile
+                StatusesGrid(
+                    media = statusesScreenUiState.media,
+                    saveMediaFile = { mediaFile ->
+                        sendEvent(
+                            StatusesScreenUiEvents.SaveMediaFile(
+                                mediaFile = mediaFile
+                            )
                         )
-                    )
-                },
-                shareMediaFile = { mediaFile ->
-                    sendEvent(
-                        StatusesScreenUiEvents.ShareMediaFile(
-                            mediaFile = mediaFile
+                    },
+                    shareMediaFile = { mediaFile ->
+                        sendEvent(
+                            StatusesScreenUiEvents.ShareMediaFile(
+                                mediaFile = mediaFile
+                            )
                         )
-                    )
-                },
-                onImageClicked = {
-                    sendEvent(
-                        StatusesScreenUiEvents.ShowFullImageDialog(
-                            show = true,
-                            imageUri = it
+                    },
+                    onImageClicked = {
+                        sendEvent(
+                            StatusesScreenUiEvents.ShowFullImageDialog(
+                                show = true,
+                                imageUri = it
+                            )
                         )
-                    )
-                },
-                onVideoClicked = {
-                    sendEvent(
-                        StatusesScreenUiEvents.PlayVideo(
-                            videoUri = it
+                    },
+                    onVideoClicked = {
+                        sendEvent(
+                            StatusesScreenUiEvents.PlayVideo(
+                                videoUri = it
+                            )
                         )
-                    )
-                }
-            )
+                    }
+                )
+            }
         }
     }
 }

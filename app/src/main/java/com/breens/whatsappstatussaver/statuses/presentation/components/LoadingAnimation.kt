@@ -27,7 +27,7 @@ fun LoadingAnimation() {
             verticalArrangement = Arrangement.Center,
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(70.dp),
+                modifier = Modifier.size(40.dp),
                 color = MaterialTheme.colorScheme.primary,
             )
 

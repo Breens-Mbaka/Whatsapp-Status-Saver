@@ -23,7 +23,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-
         setContent {
             LaunchedEffect(key1 = true) {
                 downloadingOnboardingScreenViewModel.getIsOnboardingCompleted()
@@ -47,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
         WhatsappStatusSaverNavHost(
             navHostController = navHostController,
-            startDestination = if (isOnBoardingCompleted) "images" else "download_onboarding_screen",
+            startDestination = if (isOnBoardingCompleted) "images" else "onboarding_screen",
         )
     }
 }

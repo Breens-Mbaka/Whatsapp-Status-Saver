@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.breens.whatsappstatussaver.onboarding.ImagesOnboardingScreen
+import com.breens.whatsappstatussaver.onboarding.OnboardingScreen
 import com.breens.whatsappstatussaver.player.domain.Video
 import com.breens.whatsappstatussaver.player.domain.VideoType
 import com.breens.whatsappstatussaver.player.presentation.PreviewVideoScreen
@@ -26,22 +26,20 @@ fun WhatsappStatusSaverNavHost(
     NavHost(
         navController = navHostController,
         startDestination = startDestination,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700),
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700),
+            )
+        },
     ) {
-        composable(
-            route = "images",
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(700),
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(700),
-                )
-            },
-        ) {
+        composable(route = "images") {
             StatusesScreen(
                 playVideo = {
                     val video = Video(videoUri = it.toString())
@@ -53,23 +51,9 @@ fun WhatsappStatusSaverNavHost(
             )
         }
 
-        composable(
-            route = "download_onboarding_screen",
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(700),
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(700),
-                )
-            },
-        ) {
-            ImagesOnboardingScreen(
-                navigateToImagesScreen = {
+        composable(route = "onboarding_screen") {
+            OnboardingScreen(
+                navigateToStatusScreen = {
                     navHostController.navigate(
                         route = "images",
                     )

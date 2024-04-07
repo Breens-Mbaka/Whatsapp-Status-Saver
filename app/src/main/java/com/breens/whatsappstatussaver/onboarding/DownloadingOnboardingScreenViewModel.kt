@@ -1,14 +1,13 @@
 package com.breens.whatsappstatussaver.onboarding
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.breens.whatsappstatussaver.preferences.domain.PreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class DownloadingOnboardingScreenViewModel @Inject constructor(private val preferencesRepository: PreferencesRepository) :
@@ -29,7 +28,6 @@ class DownloadingOnboardingScreenViewModel @Inject constructor(private val prefe
         viewModelScope.launch {
             preferencesRepository.isOnBoardingCompleted()
                 .collectLatest { isOnBoardingCompleted ->
-                    Log.e("DownloadingScreen", "isOnBoardingCompleted: $isOnBoardingCompleted")
                     isOnBoardingCompletedState.value = isOnBoardingCompleted
                 }
         }

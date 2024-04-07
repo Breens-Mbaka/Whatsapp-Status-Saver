@@ -12,6 +12,8 @@ data class StatusesScreenUiState(
     val imageSavedSuccessfully: Boolean = false,
     val selectedTab: Int = 0,
     val tabs: List<TabItem> = tabList,
+    val showFullImageDialog: Boolean = false,
+    val imageUriClicked: Uri? = null,
 )
 
 val tabList = listOf(

@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
 import com.breens.whatsappstatussaver.share.shareImage
 import com.breens.whatsappstatussaver.share.shareVideo
+import com.breens.whatsappstatussaver.statuses.presentation.components.FulImageDialog
 import com.breens.whatsappstatussaver.statuses.presentation.components.StatusesGrid
 import kotlinx.coroutines.flow.collectLatest
 
@@ -103,6 +104,8 @@ fun StatusesScreen(
                         context.shareImage(imageUri = event.mediaFile.thumbnailUri)
                     }
                 }
+
+                else -> {}
             }
         }
     }
@@ -153,6 +156,20 @@ private fun StatusesScreenContent(
             )
         },
     ) { paddingValues ->
+        if (imagesUiState.showFullImageDialog) {
+            FulImageDialog(
+                imageUri = imagesUiState.imageUriClicked,
+                closeDialog = {
+                    sendEvent(
+                        StatusesScreenUiEvents.ShowFullImageDialog(
+                            show = false,
+                            imageUri = null
+                        )
+                    )
+                }
+            )
+        }
+
         Column(
             modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -191,6 +208,14 @@ private fun StatusesScreenContent(
                     sendEvent(
                         StatusesScreenUiEvents.ShareMediaFile(
                             mediaFile = mediaFile
+                        )
+                    )
+                },
+                onImageClicked = {
+                    sendEvent(
+                        StatusesScreenUiEvents.ShowFullImageDialog(
+                            show = true,
+                            imageUri = it
                         )
                     )
                 }

@@ -64,7 +64,20 @@ class StatusesViewModel @Inject constructor(
                        StatusesScreenUiEvents.ShareMediaFile(mediaFile = event.mediaFile)
                    )
                 }
+
+                is StatusesScreenUiEvents.ShowFullImageDialog -> {
+                    showFullImageDialog(showFullImageDialog = event.show, imageUri = event.imageUri)
+                }
             }
+        }
+    }
+
+    private fun showFullImageDialog(showFullImageDialog: Boolean, imageUri: Uri?) {
+        _statusesScreenUiState.update {
+            it.copy(
+                showFullImageDialog = showFullImageDialog,
+                imageUriClicked = imageUri
+            )
         }
     }
 

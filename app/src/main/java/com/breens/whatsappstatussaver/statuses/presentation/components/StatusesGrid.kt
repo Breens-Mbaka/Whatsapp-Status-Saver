@@ -1,5 +1,6 @@
 package com.breens.whatsappstatussaver.statuses.presentation.components
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ fun StatusesGrid(
     media: List<Media>,
     saveMediaFile: (Media) -> Unit,
     shareMediaFile: (Media) -> Unit,
+    onImageClicked: (Uri) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.padding(16.dp),
@@ -46,7 +48,14 @@ fun StatusesGrid(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .padding(4.dp),
+                    .padding(4.dp)
+                    .clickable {
+                        if (mediaFile.isVideo) {
+                            //onVideoClicked()
+                        } else {
+                            mediaFile.thumbnailUri?.let { onImageClicked(it) }
+                        }
+                    },
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Black),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),

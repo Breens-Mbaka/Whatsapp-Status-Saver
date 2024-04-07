@@ -9,4 +9,5 @@ sealed class StatusesScreenUiEvents {
     data class SaveMediaFile(val mediaFile: Media) : StatusesScreenUiEvents()
     data class ShareMediaFile(val mediaFile: Media) : StatusesScreenUiEvents()
     data class ChangeTab(val tab: Int) : StatusesScreenUiEvents()
+    data class ShowFullImageDialog(val show: Boolean, val imageUri: Uri?) : StatusesScreenUiEvents()
 }

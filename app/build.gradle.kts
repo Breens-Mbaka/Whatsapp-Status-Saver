@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -106,6 +107,13 @@ dependencies {
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:5.2.0")
+
+    // Exoplayer
+    implementation("androidx.media3:media3-exoplayer:1.3.0")
+    implementation("androidx.media3:media3-ui:1.3.0")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.10")
 }
 
 kapt {

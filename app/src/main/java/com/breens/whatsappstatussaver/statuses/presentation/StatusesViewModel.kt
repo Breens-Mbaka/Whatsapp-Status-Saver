@@ -60,13 +60,19 @@ class StatusesViewModel @Inject constructor(
                 }
 
                 is StatusesScreenUiEvents.ShareMediaFile -> {
-                   _eventFlow.emit(
-                       StatusesScreenUiEvents.ShareMediaFile(mediaFile = event.mediaFile)
-                   )
+                    _eventFlow.emit(
+                        StatusesScreenUiEvents.ShareMediaFile(mediaFile = event.mediaFile)
+                    )
                 }
 
                 is StatusesScreenUiEvents.ShowFullImageDialog -> {
                     showFullImageDialog(showFullImageDialog = event.show, imageUri = event.imageUri)
+                }
+
+                is StatusesScreenUiEvents.PlayVideo -> {
+                    _eventFlow.emit(
+                        StatusesScreenUiEvents.PlayVideo(videoUri = event.videoUri)
+                    )
                 }
             }
         }

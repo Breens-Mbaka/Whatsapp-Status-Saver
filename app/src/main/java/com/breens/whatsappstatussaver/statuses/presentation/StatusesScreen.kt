@@ -2,6 +2,7 @@ package com.breens.whatsappstatussaver.statuses.presentation
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun StatusesScreen(
     viewModel: StatusesViewModel = hiltViewModel(),
+    playVideo: (Uri?) -> Unit,
 ) {
     val analytics = viewModel.analytics()
     val context = LocalContext.current
@@ -103,6 +105,11 @@ fun StatusesScreen(
                     } else {
                         context.shareImage(imageUri = event.mediaFile.thumbnailUri)
                     }
+                }
+
+                is StatusesScreenUiEvents.PlayVideo -> {
+                    analytics.logEvent("play_video", null)
+                    playVideo(event.videoUri)
                 }
 
                 else -> {}
@@ -216,6 +223,13 @@ private fun StatusesScreenContent(
                         StatusesScreenUiEvents.ShowFullImageDialog(
                             show = true,
                             imageUri = it
+                        )
+                    )
+                },
+                onVideoClicked = {
+                    sendEvent(
+                        StatusesScreenUiEvents.PlayVideo(
+                            videoUri = it
                         )
                     )
                 }

@@ -38,6 +38,7 @@ fun StatusesGrid(
     saveMediaFile: (Media) -> Unit,
     shareMediaFile: (Media) -> Unit,
     onImageClicked: (Uri) -> Unit,
+    onVideoClicked: (Uri?) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.padding(16.dp),
@@ -51,7 +52,7 @@ fun StatusesGrid(
                     .padding(4.dp)
                     .clickable {
                         if (mediaFile.isVideo) {
-                            //onVideoClicked()
+                            onVideoClicked(mediaFile.videoUri)
                         } else {
                             mediaFile.thumbnailUri?.let { onImageClicked(it) }
                         }

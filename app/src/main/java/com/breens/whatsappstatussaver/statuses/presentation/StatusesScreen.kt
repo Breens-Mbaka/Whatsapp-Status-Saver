@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -34,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
 import com.breens.whatsappstatussaver.share.shareImage
 import com.breens.whatsappstatussaver.share.shareVideo
@@ -46,8 +46,9 @@ import kotlinx.coroutines.flow.collectLatest
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun StatusesScreen(
-    viewModel: StatusesViewModel = hiltViewModel(),
+    viewModel: StatusesViewModel,
     playVideo: (Uri?) -> Unit,
+    savedUri: Uri?,
 ) {
     val analytics = viewModel.analytics()
     val context = LocalContext.current
@@ -69,15 +70,36 @@ fun StatusesScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intent = context.mediaFolderIntent()
-            launcher.launch(intent)
-        } else {
+    val mediaPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+    ) { isGranted ->
+        if (isGranted.all { it.value }) {
             viewModel.sendEvent(
                 event = StatusesScreenUiEvents.GetStatusImages(
                     uri = null,
                     fromNormalStorage = true
+                )
+            )
+        } else {
+            viewModel.sendEvent(
+                event = StatusesScreenUiEvents.ShowSnackBar(
+                    message = "Permission denied"
+                )
+            )
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        Log.e("SAVED_URI", "$savedUri")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val intent = context.mediaFolderIntent()
+            launcher.launch(intent)
+        } else {
+            mediaPermissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.READ_MEDIA_IMAGES,
+                    android.Manifest.permission.READ_MEDIA_VIDEO,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             )
         }

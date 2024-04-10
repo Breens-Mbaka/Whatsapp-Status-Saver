@@ -6,6 +6,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,6 +18,7 @@ import com.breens.whatsappstatussaver.player.domain.Video
 import com.breens.whatsappstatussaver.player.domain.VideoType
 import com.breens.whatsappstatussaver.player.presentation.PreviewVideoScreen
 import com.breens.whatsappstatussaver.statuses.presentation.StatusesScreen
+import com.breens.whatsappstatussaver.statuses.presentation.StatusesViewModel
 import com.google.gson.Gson
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -22,7 +26,14 @@ import com.google.gson.Gson
 fun WhatsappStatusSaverNavHost(
     navHostController: NavHostController,
     startDestination: String,
+    statusesViewModel: StatusesViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(key1 = Unit) {
+        statusesViewModel.getSavedUri()
+    }
+
+    val savedUri = statusesViewModel.statusesScreenUiState.collectAsState().value.uri
+
     NavHost(
         navController = navHostController,
         startDestination = startDestination,
@@ -41,6 +52,8 @@ fun WhatsappStatusSaverNavHost(
     ) {
         composable(route = "images") {
             StatusesScreen(
+                viewModel = statusesViewModel,
+                savedUri = savedUri,
                 playVideo = {
                     val video = Video(videoUri = it.toString())
                     val json = Uri.encode(Gson().toJson(video))

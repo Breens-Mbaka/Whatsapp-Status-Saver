@@ -1,8 +1,10 @@
 package com.breens.whatsappstatussaver.statuses.presentation
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.breens.whatsappstatussaver.preferences.domain.PreferencesRepository
 import com.breens.whatsappstatussaver.save.domain.SaveImagesRepository
 import com.breens.whatsappstatussaver.statuses.domain.GetStatusesRepository
 import com.breens.whatsappstatussaver.statuses.domain.Media
@@ -13,6 +15,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,6 +24,7 @@ import kotlinx.coroutines.launch
 class StatusesViewModel @Inject constructor(
     private val getStatusesRepository: GetStatusesRepository,
     private val saveImagesRepository: SaveImagesRepository,
+    private val preferencesRepository: PreferencesRepository,
     private val analytics: FirebaseAnalytics,
 ) : ViewModel() {
     private val _statusesScreenUiState = MutableStateFlow(StatusesScreenUiState())
@@ -133,6 +138,10 @@ class StatusesViewModel @Inject constructor(
                     media = media
                 )
             }
+
+            Log.e("MEDIA", "$media")
+
+            preferencesRepository.setUri(uri = uri)
         }
     }
 
@@ -167,6 +176,21 @@ class StatusesViewModel @Inject constructor(
             _eventFlow.emit(
                 StatusesScreenUiEvents.ShowSnackBar(message = "Failed to save image, try again.")
             )
+        }
+    }
+
+    fun getSavedUri() {
+        viewModelScope.launch {
+            val savedUri = preferencesRepository.getUri().first()
+
+            _statusesScreenUiState.update {
+                it.copy(
+                    uri = savedUri
+                )
+            }
+
+            // if uri is empty ask permission to fetch images
+            // if its not empty used saved uri to fetch images
         }
     }
 

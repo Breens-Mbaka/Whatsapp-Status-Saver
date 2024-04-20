@@ -14,6 +14,7 @@ data class StatusesScreenUiState(
     val tabs: List<TabItem> = tabList,
     val showFullImageDialog: Boolean = false,
     val imageUriClicked: Uri? = null,
+    val helpInstructionsIsDialogOpen: Boolean = false,
 )
 
 val tabList = listOf(

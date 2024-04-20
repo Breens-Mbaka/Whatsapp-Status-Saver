@@ -11,4 +11,5 @@ sealed class StatusesScreenUiEvents {
     data class ChangeTab(val tab: Int) : StatusesScreenUiEvents()
     data class ShowFullImageDialog(val show: Boolean, val imageUri: Uri?) : StatusesScreenUiEvents()
     data class PlayVideo(val videoUri: Uri?) : StatusesScreenUiEvents()
+    data class ShowHelpInstructions(val show: Boolean) : StatusesScreenUiEvents()
 }

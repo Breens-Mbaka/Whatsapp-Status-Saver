@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -79,7 +78,19 @@ class StatusesViewModel @Inject constructor(
                         StatusesScreenUiEvents.PlayVideo(videoUri = event.videoUri)
                     )
                 }
+
+                is StatusesScreenUiEvents.ShowHelpInstructions -> {
+                    showHelpInstructions(helpInstructionsIsDialogOpen = event.show)
+                }
             }
+        }
+    }
+
+    private fun showHelpInstructions(helpInstructionsIsDialogOpen: Boolean) {
+        _statusesScreenUiState.update {
+            it.copy(
+                helpInstructionsIsDialogOpen = helpInstructionsIsDialogOpen
+            )
         }
     }
 

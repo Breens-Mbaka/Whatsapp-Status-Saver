@@ -17,6 +17,7 @@ import com.breens.whatsappstatussaver.onboarding.OnboardingScreen
 import com.breens.whatsappstatussaver.player.domain.Video
 import com.breens.whatsappstatussaver.player.domain.VideoType
 import com.breens.whatsappstatussaver.player.presentation.PreviewVideoScreen
+import com.breens.whatsappstatussaver.settings.SettingsScreen
 import com.breens.whatsappstatussaver.statuses.presentation.StatusesScreen
 import com.breens.whatsappstatussaver.statuses.presentation.StatusesViewModel
 import com.google.gson.Gson
@@ -50,7 +51,7 @@ fun WhatsappStatusSaverNavHost(
             )
         },
     ) {
-        composable(route = "images") {
+        composable(route = Screen.StatusesScreen.route) {
             StatusesScreen(
                 viewModel = statusesViewModel,
                 savedUri = savedUri,
@@ -64,22 +65,30 @@ fun WhatsappStatusSaverNavHost(
             )
         }
 
-        composable(route = "onboarding_screen") {
+        composable(route = Screen.OnboardingScreen.route) {
             OnboardingScreen(
                 navigateToStatusScreen = {
                     navHostController.navigate(
-                        route = "images",
+                        route = Screen.StatusesScreen.route,
                     )
                 },
             )
         }
 
         composable(
-            "preview_video/{video}",
+            route = Screen.PreviewVideoScreen.route,
             arguments = listOf(navArgument("video") { type = VideoType() })
         ) { backStackEntry ->
             PreviewVideoScreen(
                 video = backStackEntry.arguments?.getParcelable("video"),
+                navigateBack = {
+                    navHostController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = Screen.SettingsScreen.route) {
+            SettingsScreen(
                 navigateBack = {
                     navHostController.popBackStack()
                 }

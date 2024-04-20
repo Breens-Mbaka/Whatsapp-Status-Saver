@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
 import com.breens.whatsappstatussaver.share.shareImage
 import com.breens.whatsappstatussaver.share.shareVideo
+import com.breens.whatsappstatussaver.statuses.presentation.components.EmptyComponent
 import com.breens.whatsappstatussaver.statuses.presentation.components.FulImageDialog
+import com.breens.whatsappstatussaver.statuses.presentation.components.HelpInstructionsDialog
 import com.breens.whatsappstatussaver.statuses.presentation.components.LoadingAnimation
 import com.breens.whatsappstatussaver.statuses.presentation.components.StatusesGrid
 import kotlinx.coroutines.flow.collectLatest
@@ -186,10 +188,6 @@ private fun StatusesScreenContent(
             )
         },
     ) { paddingValues ->
-        if (statusesScreenUiState.isLoading) {
-            LoadingAnimation()
-        }
-
         if (statusesScreenUiState.showFullImageDialog) {
             FulImageDialog(
                 imageUri = statusesScreenUiState.imageUriClicked,
@@ -198,6 +196,34 @@ private fun StatusesScreenContent(
                         StatusesScreenUiEvents.ShowFullImageDialog(
                             show = false,
                             imageUri = null
+                        )
+                    )
+                }
+            )
+        }
+
+        if (statusesScreenUiState.helpInstructionsIsDialogOpen) {
+            HelpInstructionsDialog(
+                closeDialog = {
+                    sendEvent(
+                        StatusesScreenUiEvents.ShowHelpInstructions(
+                            show = false
+                        )
+                    )
+                }
+            )
+        }
+
+        if (statusesScreenUiState.isLoading) {
+            LoadingAnimation()
+        }
+
+        if (!statusesScreenUiState.isLoading && statusesScreenUiState.media.isEmpty()) {
+            EmptyComponent(
+                showHelpInstructions = {
+                    sendEvent(
+                        StatusesScreenUiEvents.ShowHelpInstructions(
+                            show = true
                         )
                     )
                 }

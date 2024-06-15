@@ -10,14 +10,27 @@ import androidx.documentfile.provider.DocumentFile
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun Context.mediaFolderIntent(): Intent {
-    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-    intent.putExtra(
-        DocumentsContract.EXTRA_INITIAL_URI,
-        DocumentFile.fromTreeUri(
-            this,
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia%2FStatuses"),
-        )!!.uri,
+fun Context.getMediaFolder(): DocumentFile? {
+    val mediaFolder = DocumentFile.fromTreeUri(
+        this,
+        Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia%2F.Statuses"),
     )
-    return intent
+    return mediaFolder
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun checkIfMediaFolderAccessible(documentFile: DocumentFile): Boolean {
+    return documentFile.canRead()
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun Context.mediaFolderIntent(documentFile: DocumentFile): Intent {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        intent.putExtra(
+            DocumentsContract.EXTRA_INITIAL_URI,
+            documentFile.uri,
+        )
+        return intent
 }

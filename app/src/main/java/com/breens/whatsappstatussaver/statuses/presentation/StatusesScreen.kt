@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.breens.whatsappstatussaver.mediafilepermission.checkIfMediaFolderAccessible
+import com.breens.whatsappstatussaver.mediafilepermission.getMediaFolder
 import com.breens.whatsappstatussaver.mediafilepermission.mediaFolderIntent
 import com.breens.whatsappstatussaver.share.shareImage
 import com.breens.whatsappstatussaver.share.shareVideo
@@ -62,6 +64,7 @@ fun StatusesScreen(
         if (result.resultCode == Activity.RESULT_OK) {
             val intent: Intent? = result.data
             if (intent != null) {
+                context.contentResolver.takePersistableUriPermission(intent.data!!, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 viewModel.sendEvent(
                     event = StatusesScreenUiEvents.GetStatusImages(
                         uri = intent.data,
@@ -94,8 +97,18 @@ fun StatusesScreen(
     LaunchedEffect(key1 = Unit) {
         Log.e("SAVED_URI", "$savedUri")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intent = context.mediaFolderIntent()
-            launcher.launch(intent)
+            val mediaDocumentFile = context.getMediaFolder()
+            if (checkIfMediaFolderAccessible(mediaDocumentFile!!)) {
+                viewModel.sendEvent(
+                    event = StatusesScreenUiEvents.GetStatusImages(
+                        uri = mediaDocumentFile.uri,
+                        fromNormalStorage = false
+                    )
+                )
+            } else {
+                val intent = context.mediaFolderIntent(mediaDocumentFile)
+                launcher.launch(intent)
+            }
         } else {
             mediaPermissionLauncher.launch(
                 arrayOf(

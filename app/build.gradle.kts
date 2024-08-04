@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.breens.whatsappstatussaver"
         minSdk = 21
-        targetSdk = 33
-        versionCode = 3
-        versionName = "1.2"
+        targetSdk = 34
+        versionCode = 4
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
